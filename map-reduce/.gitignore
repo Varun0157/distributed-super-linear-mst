@@ -2,3 +2,7 @@ src/bin
 src/.project
 
 target 
+
+.settings
+.classpath
+.project
