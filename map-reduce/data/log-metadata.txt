@@ -1,0 +1,14 @@
+generated log file: log_1.txt
+generated log file: log_2.txt
+generated log file: log_3.txt
+generated log file: log_4.txt
+generated log file: log_5.txt
+generated log file: log_6.txt
+generated log file: log_7.txt
+generated log file: log_8.txt
+generated log file: log_9.txt
+generated log file: log_10.txt
+counts:
+ERROR: 342
+INFO: 330
+WARN: 328
