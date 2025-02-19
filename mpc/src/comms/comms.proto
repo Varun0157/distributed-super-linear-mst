@@ -1,0 +1,20 @@
+syntax = "proto3";
+option go_package = "mst/superlinear/comms";
+package comms;
+
+service EdgeDataService {
+  rpc sendEdgeData(EdgeDataRequest) returns (EdgeDataResponse) {}
+}
+
+message EdgeData {
+  int32 src = 1;
+  int32 dest = 2;
+  int32 weight = 3;
+}
+
+message EdgeDataRequest {
+  repeated EdgeData edges = 1;
+  string addr = 2;
+}
+
+message EdgeDataResponse { bool success = 1; }
