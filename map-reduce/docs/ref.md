@@ -1,3 +1,3 @@
 # Basics of MapReduce using Java 
-- https://matthewmacfarquhar.medium.com/mastering-mapreduce-a-step-by-step-java-tutorial-for-big-data-processing-47e1bd96d6e2
+- https://chatgpt.com/share/67b5e771-0d5c-8005-9f23-38d12777b5fc
 
