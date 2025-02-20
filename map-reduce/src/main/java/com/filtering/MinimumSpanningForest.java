@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class MinimumSpanningForest {
-  private static final String NUM_REDUCERS_NAME = "numReducers";
+  private static final String NUM_REDUCERS_KEY = "numReducers";
 
   public static class MSTMapper extends Mapper<Object, Text, IntWritable, Text> {
     private List<GraphUtils.Edge> edges = new ArrayList<>();
@@ -23,7 +23,7 @@ public class MinimumSpanningForest {
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
       super.setup(context);
-      numReducers = context.getConfiguration().getInt(NUM_REDUCERS_NAME, -1);
+      numReducers = context.getConfiguration().getInt(NUM_REDUCERS_KEY, -1);
 
       if (numReducers <= 0) {
         throw new IOException("number of reducers not set to a positive value");
@@ -88,7 +88,7 @@ public class MinimumSpanningForest {
     job.setJarByClass(MinimumSpanningForest.class);
     job.setMapperClass(MSTMapper.class);
     job.setReducerClass(EdgeReducer.class);
-    job.getConfiguration().setInt(NUM_REDUCERS_NAME, numReducers);
+    job.getConfiguration().setInt(NUM_REDUCERS_KEY, numReducers);
     job.setNumReduceTasks(numReducers);
 
     job.setMapOutputKeyClass(IntWritable.class);
