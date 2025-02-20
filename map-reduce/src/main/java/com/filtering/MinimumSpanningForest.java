@@ -116,14 +116,14 @@ public class MinimumSpanningForest {
     }
   }
 
-  public static void main(String[] args) throws Exception {
+  public static boolean runMSF(String inputPath, String outputPath, int numReducers) throws Exception {
     Configuration conf = new Configuration();
     Job job = Job.getInstance(conf, "Minimum Spanning Forest");
 
     job.setJarByClass(MinimumSpanningForest.class);
     job.setMapperClass(MSTMapper.class);
     job.setReducerClass(EdgeReducer.class);
-    job.setNumReduceTasks(2); // Set number of reducers to 2
+    job.setNumReduceTasks(numReducers);
 
     job.setMapOutputKeyClass(IntWritable.class);
     job.setMapOutputValueClass(Text.class);
@@ -133,6 +133,19 @@ public class MinimumSpanningForest {
     FileInputFormat.addInputPath(job, new Path("file:///home/varun.edachali/map-reduce/data"));
     FileOutputFormat.setOutputPath(job, new Path("file:///home/varun.edachali/map-reduce/res"));
 
-    System.exit(job.waitForCompletion(true) ? 0 : 1);
+    return job.waitForCompletion(true);
+  }
+
+  public static void main(String[] args) throws Exception {
+    if (args.length != 3) {
+      System.err.println("Usage: MinimumSpanningForest <input path> <output path> <numReducers>");
+      System.exit(-1);
+    }
+    String inputPath = args[0];
+    String outputPath = args[1];
+    int numReducers = Integer.parseInt(args[2]);
+
+    boolean success = runMSF(inputPath, outputPath, numReducers);
+    System.exit(success ? 0 : 1);
   }
 }
