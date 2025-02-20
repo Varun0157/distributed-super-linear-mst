@@ -79,11 +79,12 @@ public class MinimumSpanningTree {
       System.out.println("Usage args: <graph_path> <input_dir> <output_prefix> <epsilon>");
       System.exit(-1);
     }
-    final String inputDir = args[0];
-    final String outputPrefix = args[1];
-    final float epsilon = Float.parseFloat(args[2]);
+    final String graphPath = args[0];
+    final String inputDir = args[1];
+    final String outputPrefix = args[2];
+    final float epsilon = Float.parseFloat(args[3]);
 
-    // TODO: take a single file as input and split it as a part of operations
+    FilteringUtils.splitGraph(graphPath, inputDir, epsilon);
     calculateMST(inputDir, outputPrefix, epsilon);
   }
 }

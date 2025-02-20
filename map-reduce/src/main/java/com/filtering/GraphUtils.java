@@ -24,7 +24,7 @@ public class GraphUtils {
       return src + " " + dest + " " + weight;
     }
 
-    public static Edge readEdge(String line) throws IOException {
+    public static Edge read(String line) throws IOException {
       String[] parts = line.split("\\s+");
       if (parts.length != 3) {
         throw new IllegalArgumentException("invalid input line: " + line);

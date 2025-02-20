@@ -54,7 +54,7 @@ public class MinimumSpanningForest {
       setup(context);
       while (context.nextKeyValue()) {
         String line = context.getCurrentValue().toString().trim();
-        GraphUtils.Edge edge = GraphUtils.Edge.readEdge(line);
+        GraphUtils.Edge edge = GraphUtils.Edge.read(line);
         edges.add(edge);
       }
 
