@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 
 import org.apache.hadoop.conf.Configuration;
@@ -9,31 +11,35 @@ import org.apache.hadoop.fs.Path;
 
 public class MinimumSpanningTree {
   private static void deleteMetaDataFiles(String dirPath, String prefix) throws IOException {
-    File dir = new File(dirPath);
-    if (!dir.exists()) {
-      throw new IOException("directory does not exist: " + dirPath);
-    }
-    if (!dir.isDirectory()) {
-      throw new IOException("not a directory: " + dirPath);
-    }
-
-    File[] files = dir.listFiles((directory, fileName) -> fileName.startsWith(prefix));
-    if (files == null) {
-      throw new IOException("unable to list files in directory: " + dirPath);
-    }
-
-    for (File file : files) {
-      System.out.println("deleting " + file.getName());
-      if (file.delete()) {
-        continue;
+    try {
+      File dir = new File(new URI(dirPath));
+      if (!dir.exists()) {
+        throw new IOException("directory does not exist: " + dirPath);
       }
-      throw new IOException("failed to delete " + file.getName());
+      if (!dir.isDirectory()) {
+        throw new IOException("not a directory: " + dirPath);
+      }
+
+      File[] files = dir.listFiles((directory, fileName) -> fileName.startsWith(prefix));
+      if (files == null) {
+        throw new IOException("unable to list files in directory: " + dirPath);
+      }
+
+      for (File file : files) {
+        System.out.println("deleting " + file.getName());
+        if (file.delete()) {
+          continue;
+        }
+        throw new IOException("failed to delete " + file.getName());
+      }
+    } catch (URISyntaxException e) {
+      throw new IOException("invalid uri syntax", e);
     }
   }
 
-  private static void calculateMST(String inputDir, String outputPrefix, float epsilon) throws Exception {
+  private static void calculateMST(String inputDir, String outputPrefix, MetaData md) throws Exception {
     final String basePath = "file:///home/varun.edachali/map-reduce/";
-    final String inputPath = basePath + inputDir;
+    String inputPath = basePath + inputDir;
 
     Configuration conf = new Configuration();
     conf.set("fs.defaultFS", "file:///"); // use local file system instead of hdfs
@@ -45,13 +51,7 @@ public class MinimumSpanningTree {
       int numFiles = inputFiles.length;
       System.out.println("round " + round + ": " + numFiles + " files found in " + inputPath);
 
-      if (numFiles <= 1) {
-        System.out.println("only one file remains. Terminating iterations.");
-        break;
-      }
-
-      final double reductionFactor = Math.pow(10, 1 + epsilon);
-      final int numReducers = (int) Math.ceil((double) numFiles / reductionFactor);
+      final int numReducers = md.getNumComputationalNodes(round);
       final String outputPath = basePath + outputPrefix + round;
       System.out.println("running job with " + numReducers + " reducers, output will be stored in " + outputPath);
 
@@ -71,12 +71,17 @@ public class MinimumSpanningTree {
 
       inputPath = outputPath;
       round++;
+
+      if (numFiles <= 1) {
+        System.out.println("only one input file was present. Terminating iterations.");
+        break;
+      }
     }
   }
 
   public static void main(String[] args) throws Exception {
-    if (args.length != 2) {
-      System.out.println("Usage args: <graph_path> <input_dir> <output_prefix> <epsilon>");
+    if (args.length != 4) {
+      System.out.println("usage args: <graph_path> <input_dir> <output_prefix> <epsilon>");
       System.exit(-1);
     }
     final String graphPath = args[0];
@@ -84,7 +89,7 @@ public class MinimumSpanningTree {
     final String outputPrefix = args[2];
     final float epsilon = Float.parseFloat(args[3]);
 
-    FilteringUtils.splitGraph(graphPath, inputDir, epsilon);
-    calculateMST(inputDir, outputPrefix, epsilon);
+    MetaData md = FilteringUtils.splitGraph(graphPath, inputDir, epsilon);
+    calculateMST(inputDir, outputPrefix, md);
   }
 }
