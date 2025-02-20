@@ -148,18 +148,4 @@ public class MinimumSpanningForest {
 
     return job.waitForCompletion(true);
   }
-
-  // public static void main(String[] args) throws Exception {
-  // if (args.length != 3) {
-  // System.err.println("Usage: MinimumSpanningForest <input path> <output path>
-  // <numReducers>");
-  // System.exit(-1);
-  // }
-  // String inputPath = args[0];
-  // String outputPath = args[1];
-  // int numReducers = Integer.parseInt(args[2]);
-  //
-  // boolean success = runMSF(inputPath, outputPath, numReducers);
-  // System.exit(success ? 0 : 1);
-  // }
 }

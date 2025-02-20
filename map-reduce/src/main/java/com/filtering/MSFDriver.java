@@ -6,7 +6,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
-import org.eclipse.jetty.util.IO;
 
 public class MSFDriver {
   private static void deleteMetaDataFiles(String dirPath, String prefix) throws IOException {
@@ -84,6 +83,7 @@ public class MSFDriver {
     final String outputPrefix = args[1];
     final float epsilon = Float.parseFloat(args[2]);
 
+    // TODO: take a single file as input and split it as a part of operations
     calculateMST(inputDir, outputPrefix, epsilon);
   }
 }
