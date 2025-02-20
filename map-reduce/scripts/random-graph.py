@@ -27,16 +27,11 @@ if __name__ == "__main__":
     parser.add_argument("n", type=int, help="Number of nodes")
     parser.add_argument("m", type=int, help="Number of edges")
     parser.add_argument("output", type=str, help="Output file name")
-    parser.add_argument("num_files", type=int, help="number of files")
-    print("warning: assumes m % num_files is 0 for now")
 
     args = parser.parse_args()
+    output_file = args.output
     graph = generate_graph(args.n, args.m)
-    edges_per_file = len(graph) // args.num_files
-    for num in range(args.num_files):
-        file_name = args.output + str(num) + ".txt"
 
-        graph_subset = graph[num * edges_per_file : (num + 1) * edges_per_file]
-        with open(file_name, "w") as f:
-            for u, v, weight in graph_subset:
-                f.write(f"{u} {v} {weight}\n")
+    with open(output_file, "w") as f:
+        for u, v, weight in graph:
+            f.write(f"{u} {v} {weight}\n")
