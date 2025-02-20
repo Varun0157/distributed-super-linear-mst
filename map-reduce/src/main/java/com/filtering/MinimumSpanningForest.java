@@ -36,12 +36,14 @@ public class MinimumSpanningForest {
 
       List<GraphUtils.Edge> msfEdges = new ArrayList<>();
       for (GraphUtils.Edge edge : edges) {
-        String rootSrc = uf.find(edge.src);
-        String rootDest = uf.find(edge.dest);
-        if (!rootSrc.equals(rootDest)) {
-          msfEdges.add(edge);
-          uf.union(rootSrc, rootDest);
+        int rootSrc = uf.find(edge.src);
+        int rootDest = uf.find(edge.dest);
+
+        if (rootSrc == rootDest) {
+          continue;
         }
+        msfEdges.add(edge);
+        uf.union(rootSrc, rootDest);
       }
 
       return msfEdges;
@@ -52,15 +54,8 @@ public class MinimumSpanningForest {
       setup(context);
       while (context.nextKeyValue()) {
         String line = context.getCurrentValue().toString().trim();
-        String[] parts = line.split("\\s+");
-        if (parts.length != 3) {
-          throw new IOException("invalid input line: " + line);
-        }
-
-        String src = parts[0];
-        String dest = parts[1];
-        int weight = Integer.parseInt(parts[2]);
-        edges.add(new GraphUtils.Edge(src, dest, weight));
+        GraphUtils.Edge edge = GraphUtils.Edge.readEdge(line);
+        edges.add(edge);
       }
 
       final List<GraphUtils.Edge> msfEdges = getLocalMSF(edges);

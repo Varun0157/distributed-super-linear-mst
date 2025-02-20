@@ -1,13 +1,14 @@
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GraphUtils {
   public static class Edge implements Comparable<Edge> {
-    public String src;
-    public String dest;
+    public int src;
+    public int dest;
     public int weight;
 
-    public Edge(String src, String dest, int weight) {
+    public Edge(int src, int dest, int weight) {
       this.src = src;
       this.dest = dest;
       this.weight = weight;
@@ -22,12 +23,24 @@ public class GraphUtils {
     public String toString() {
       return src + " " + dest + " " + weight;
     }
+
+    public static Edge readEdge(String line) throws IOException {
+      String[] parts = line.split("\\s+");
+      if (parts.length != 3) {
+        throw new IllegalArgumentException("invalid input line: " + line);
+      }
+
+      final int src = Integer.parseInt(parts[0]);
+      final int dest = Integer.parseInt(parts[1]);
+      final int weight = Integer.parseInt(parts[2]);
+      return new Edge(src, dest, weight);
+    }
   }
 
   public static class UnionFind {
-    private Map<String, String> parent = new HashMap<>();
+    private Map<Integer, Integer> parent = new HashMap<>();
 
-    public String find(String node) {
+    public int find(int node) {
       if (!parent.containsKey(node)) {
         parent.put(node, node);
         return node;
@@ -38,12 +51,14 @@ public class GraphUtils {
       return parent.get(node);
     }
 
-    public void union(String a, String b) {
-      String rootA = find(a);
-      String rootB = find(b);
-      if (!rootA.equals(rootB)) {
-        parent.put(rootA, rootB);
+    public void union(int a, int b) {
+      int rootA = find(a);
+      int rootB = find(b);
+
+      if (rootA == rootB) {
+        return;
       }
+      parent.put(rootA, rootB);
     }
   }
 }

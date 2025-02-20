@@ -76,7 +76,7 @@ public class MinimumSpanningTree {
 
   public static void main(String[] args) throws Exception {
     if (args.length != 2) {
-      System.out.println("Usage args: <input_dir> <output_prefix> <epsilon>");
+      System.out.println("Usage args: <graph_path> <input_dir> <output_prefix> <epsilon>");
       System.exit(-1);
     }
     final String inputDir = args[0];
