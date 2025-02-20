@@ -69,13 +69,13 @@ public class MinimumSpanningTree {
       // goal: get rid of the _SUCCESSS files
       deleteMetaDataFiles(outputPath, "_");
 
-      inputPath = outputPath;
-      round++;
-
       if (numFiles <= 1) {
         System.out.println("only one input file was present. Terminating iterations.");
         break;
       }
+
+      inputPath = outputPath;
+      round++;
     }
   }
 
