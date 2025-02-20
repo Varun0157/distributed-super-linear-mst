@@ -39,7 +39,7 @@ public class MSFDriver {
     conf.set("fs.defaultFS", "file:///"); // use local file system instead of hdfs
     FileSystem fs = FileSystem.get(conf);
 
-    int round = 0;
+    int round = 1;
     while (true) {
       FileStatus[] inputFiles = fs.listStatus(new Path(inputPath));
       int numFiles = inputFiles.length;
@@ -61,7 +61,7 @@ public class MSFDriver {
         fs.delete(outPath, true);
       }
 
-      boolean success = MinimumSpanningForest.runMSF(inputPath, outputPath, numReducers);
+      boolean success = MinimumSpanningForest.calculateMSF(inputPath, outputPath, numReducers);
       if (!success) {
         System.err.println("job failed in round " + round);
         System.exit(1);
