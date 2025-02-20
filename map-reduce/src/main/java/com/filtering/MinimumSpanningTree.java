@@ -7,7 +7,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 
-public class MSFDriver {
+public class MinimumSpanningTree {
   private static void deleteMetaDataFiles(String dirPath, String prefix) throws IOException {
     File dir = new File(dirPath);
     if (!dir.exists()) {
@@ -76,7 +76,7 @@ public class MSFDriver {
 
   public static void main(String[] args) throws Exception {
     if (args.length != 2) {
-      System.out.println("Usage: MSFDriver <input_dir> <output_prefix> <epsilon>");
+      System.out.println("Usage args: <input_dir> <output_prefix> <epsilon>");
       System.exit(-1);
     }
     final String inputDir = args[0];

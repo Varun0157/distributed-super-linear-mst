@@ -1,0 +1,2 @@
+- currently operates on local file system, splitting the input graph into a number of files and then simulating mapreduce computation.
+- if changing to hdfs, remember to change the file system option in the configuration called from main, and remove the graph splitting. 
