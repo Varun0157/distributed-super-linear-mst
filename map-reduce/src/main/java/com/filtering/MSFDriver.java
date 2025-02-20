@@ -23,7 +23,7 @@ public class MSFDriver {
       System.out.println("Round " + round + ": " + numFiles + " files found in " + inputPath);
 
       // Stop if there is only one file remaining.
-      if (numFiles <= 1) {
+      if (numFiles <= 2) { // some _SUCCESS file is also being pushed, fix later
         System.out.println("Only one file remains. Terminating iterations.");
         break;
       }

@@ -1,7 +1,5 @@
-src/bin
-src/.project
-
 target 
+bin
 
 .settings
 .classpath
