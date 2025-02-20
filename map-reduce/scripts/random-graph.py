@@ -38,5 +38,5 @@ if __name__ == "__main__":
 
         graph_subset = graph[num * edges_per_file : (num + 1) * edges_per_file]
         with open(file_name, "w") as f:
-            for u, v, weight in graph:
+            for u, v, weight in graph_subset:
                 f.write(f"{u} {v} {weight}\n")
