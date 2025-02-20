@@ -2,6 +2,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -12,133 +13,123 @@ import java.io.IOException;
 import java.util.*;
 
 public class MinimumSpanningForest {
-  public static class Edge {
-    int src;
-    int dest;
-    int weight;
-
-    public Edge(int s, int d, int w) {
-      this.src = s;
-      this.dest = d;
-      this.weight = w;
-    }
-
-    @Override
-    public String toString() {
-      return src + " " + dest + " " + weight;
-    }
-  }
-
-  // The mapper collects edges, computes a local MST (forest) via Kruskal's,
-  // and emits each selected edge with a random key.
   public static class MSTMapper extends Mapper<Object, Text, IntWritable, Text> {
-    private List<Edge> edgeList = new ArrayList<>();
+    private List<Edge> edges = new ArrayList<>();
     private Random random = new Random();
-    // hardcode number of reducers (i.e. target nodes) to 2 as requested
-    private int numReducers = 2;
 
     @Override
-    public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-      // Each input line is assumed to be in the form "src dest weight"
-      String line = value.toString().trim();
-      if (line.isEmpty())
-        return;
-      String[] parts = line.split("\\s+");
-      if (parts.length != 3)
-        return;
-      try {
-        int src = Integer.parseInt(parts[0]);
-        int dest = Integer.parseInt(parts[1]);
+    public void run(Context context) throws IOException, InterruptedException {
+      setup(context);
+      // Read all edges in the input split
+      while (context.nextKeyValue()) {
+        String line = context.getCurrentValue().toString().trim();
+        String[] parts = line.split("\\s+");
+        if (parts.length != 3) {
+          // Skip invalid lines
+          continue;
+        }
+        String src = parts[0];
+        String dest = parts[1];
         int weight = Integer.parseInt(parts[2]);
-        edgeList.add(new Edge(src, dest, weight));
-      } catch (NumberFormatException e) {
-        // skip malformed lines
+        edges.add(new Edge(src, dest, weight));
       }
-    }
 
-    // Standard union-find "find" with path compression.
-    private int find(Map<Integer, Integer> parent, int i) {
-      if (parent.get(i) != i) {
-        parent.put(i, find(parent, parent.get(i)));
-      }
-      return parent.get(i);
-    }
+      // Sort edges by weight
+      Collections.sort(edges);
 
-    // Standard union operation.
-    private void union(Map<Integer, Integer> parent, int x, int y) {
-      int xroot = find(parent, x);
-      int yroot = find(parent, y);
-      parent.put(xroot, yroot);
-    }
-
-    // In cleanup we have seen all lines for this mapper.
-    // We now perform Kruskal’s algorithm to compute a local MST forest.
-    @Override
-    protected void cleanup(Context context) throws IOException, InterruptedException {
-      // Gather all vertices from the edges
-      Set<Integer> vertices = new HashSet<>();
-      for (Edge edge : edgeList) {
-        vertices.add(edge.src);
-        vertices.add(edge.dest);
-      }
-      // Initialize union-find parent pointers.
-      Map<Integer, Integer> parent = new HashMap<>();
-      for (Integer v : vertices) {
-        parent.put(v, v);
-      }
-      // Sort edges by weight (ascending)
-      Collections.sort(edgeList, new Comparator<Edge>() {
-        public int compare(Edge e1, Edge e2) {
-          return Integer.compare(e1.weight, e2.weight);
-        }
-      });
-      // Run Kruskal’s algorithm.
+      // Apply Kruskal's algorithm to find MST
+      UnionFind uf = new UnionFind();
       List<Edge> mstEdges = new ArrayList<>();
-      for (Edge edge : edgeList) {
-        int x = find(parent, edge.src);
-        int y = find(parent, edge.dest);
-        if (x != y) {
+
+      for (Edge edge : edges) {
+        String rootSrc = uf.find(edge.src);
+        String rootDest = uf.find(edge.dest);
+        if (!rootSrc.equals(rootDest)) {
           mstEdges.add(edge);
-          union(parent, x, y);
+          uf.union(rootSrc, rootDest);
         }
       }
-      // Emit each MST edge with a random key (to randomly distribute among reducers).
+
+      // Emit each MST edge with a random reducer key (0 or 1)
       for (Edge edge : mstEdges) {
-        int randomKey = random.nextInt(numReducers);
-        context.write(new IntWritable(randomKey), new Text(edge.toString()));
+        int reducerNum = random.nextInt(2);
+        context.write(new IntWritable(reducerNum), new Text(edge.toString()));
+      }
+      cleanup(context);
+    }
+
+    static class Edge implements Comparable<Edge> {
+      String src;
+      String dest;
+      int weight;
+
+      Edge(String src, String dest, int weight) {
+        this.src = src;
+        this.dest = dest;
+        this.weight = weight;
+      }
+
+      @Override
+      public int compareTo(Edge o) {
+        return Integer.compare(this.weight, o.weight);
+      }
+
+      @Override
+      public String toString() {
+        return src + " " + dest + " " + weight;
+      }
+    }
+
+    static class UnionFind {
+      private Map<String, String> parent = new HashMap<>();
+
+      public String find(String node) {
+        if (!parent.containsKey(node)) {
+          parent.put(node, node);
+          return node;
+        }
+        if (!parent.get(node).equals(node)) {
+          parent.put(node, find(parent.get(node)));
+        }
+        return parent.get(node);
+      }
+
+      public void union(String a, String b) {
+        String rootA = find(a);
+        String rootB = find(b);
+        if (!rootA.equals(rootB)) {
+          parent.put(rootA, rootB);
+        }
       }
     }
   }
 
-  // The reducer simply outputs the received edges.
-  public static class RandomDistributorReducer extends Reducer<IntWritable, Text, Text, Text> {
+  public static class EdgeReducer extends Reducer<IntWritable, Text, Text, NullWritable> {
+    private NullWritable nullValue = NullWritable.get();
+
     @Override
     public void reduce(IntWritable key, Iterable<Text> values, Context context)
         throws IOException, InterruptedException {
-      for (Text edge : values) {
-        // Emit edge as key and an empty string as value
-        context.write(edge, new Text(""));
+      for (Text value : values) {
+        context.write(value, nullValue);
       }
     }
   }
 
   public static void main(String[] args) throws Exception {
     Configuration conf = new Configuration();
-    Job job = Job.getInstance(conf, "minimum spanning forest");
+    Job job = Job.getInstance(conf, "Minimum Spanning Forest");
+
     job.setJarByClass(MinimumSpanningForest.class);
     job.setMapperClass(MSTMapper.class);
-    job.setReducerClass(RandomDistributorReducer.class);
-    // Set the number of reducers to 2 (as required)
-    job.setNumReduceTasks(2);
+    job.setReducerClass(EdgeReducer.class);
+    job.setNumReduceTasks(2); // Set number of reducers to 2
 
-    // Mapper output types
     job.setMapOutputKeyClass(IntWritable.class);
     job.setMapOutputValueClass(Text.class);
-    // Reducer output types
     job.setOutputKeyClass(Text.class);
-    job.setOutputValueClass(Text.class);
+    job.setOutputValueClass(NullWritable.class);
 
-    // Use local file system paths (update these as needed)
     FileInputFormat.addInputPath(job, new Path("file:///home/varun.edachali/map-reduce/data"));
     FileOutputFormat.setOutputPath(job, new Path("file:///home/varun.edachali/map-reduce/res"));
 
