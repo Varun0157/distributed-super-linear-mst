@@ -60,6 +60,7 @@ public class MinimumSpanningForest {
 
       final List<GraphUtils.Edge> msfEdges = getLocalMSF(edges);
       for (GraphUtils.Edge edge : msfEdges) {
+        // TODO: change to a uniform spread
         int reducerNum = random.nextInt(numReducers);
         context.write(new IntWritable(reducerNum), new Text(edge.toString()));
       }

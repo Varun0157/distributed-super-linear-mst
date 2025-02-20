@@ -90,6 +90,7 @@ public class MinimumSpanningTree {
     final float epsilon = Float.parseFloat(args[3]);
 
     MetaData md = FilteringUtils.splitGraph(graphPath, inputDir, epsilon);
+    md.printRoundDetails();
     calculateMST(inputDir, outputPrefix, md);
   }
 }
