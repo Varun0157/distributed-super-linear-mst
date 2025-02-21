@@ -23,17 +23,12 @@ public class MinimumSpanningForest {
   private static final String NUM_REDUCERS_KEY = "numReducers";
 
   public static class MSTMapper extends Mapper<Object, Text, IntWritable, Text> {
-    private List<GraphUtils.Edge> edges = new ArrayList<>();
     private int numReducers;
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
       super.setup(context);
       numReducers = context.getConfiguration().getInt(NUM_REDUCERS_KEY, -1);
-
-      if (numReducers <= 0) {
-        throw new IOException("number of reducers not set to a positive value");
-      }
     }
 
     private List<GraphUtils.Edge> getLocalMSF(List<GraphUtils.Edge> edges) {
@@ -58,6 +53,12 @@ public class MinimumSpanningForest {
     @Override
     public void run(Context context) throws IOException, InterruptedException {
       setup(context);
+
+      if (numReducers <= 0) {
+        throw new IOException("number of reducers not set to a positive value");
+      }
+
+      List<GraphUtils.Edge> edges = new ArrayList<>();
       while (context.nextKeyValue()) {
         String line = context.getCurrentValue().toString().trim();
         GraphUtils.Edge edge = GraphUtils.Edge.read(line);

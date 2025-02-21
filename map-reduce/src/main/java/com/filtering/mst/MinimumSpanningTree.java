@@ -23,8 +23,8 @@ public class MinimumSpanningTree {
     int round = 1;
     while (true) {
       FileStatus[] inputFiles = fs.listStatus(new Path(inputPath));
-      int numFiles = inputFiles.length;
-      System.out.println("round " + round + ": " + numFiles + " files found in " + inputPath);
+      final int numInputFiles = inputFiles.length;
+      System.out.println("round " + round + ": " + numInputFiles + " files found in " + inputPath);
 
       final int numReducers = md.getNumComputationalNodes(round);
       final String outputPath = new File(basePath, outputPrefix + round).toString();
@@ -43,7 +43,7 @@ public class MinimumSpanningTree {
         System.exit(1);
       }
 
-      if (numFiles <= 1) {
+      if (numInputFiles <= 1) {
         System.out.println();
         System.out.println("-- only one input file was present -> terminating iterations after " + round + " rounds.");
         break;
