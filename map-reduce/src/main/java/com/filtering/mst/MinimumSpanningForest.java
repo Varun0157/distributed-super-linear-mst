@@ -12,7 +12,9 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import com.filtering.util.GraphUtils;
 import com.filtering.util.GeneralUtils;
@@ -22,7 +24,6 @@ public class MinimumSpanningForest {
 
   public static class MSTMapper extends Mapper<Object, Text, IntWritable, Text> {
     private List<GraphUtils.Edge> edges = new ArrayList<>();
-    private Random random = new Random();
     private int numReducers;
 
     @Override
@@ -64,7 +65,7 @@ public class MinimumSpanningForest {
       }
 
       List<GraphUtils.Edge> msfEdges = getLocalMSF(edges);
-      Collections.shuffle(msfEdges, random); // shuffle the edges before split to introduce randomness
+      Collections.shuffle(msfEdges); // shuffle the edges before split to introduce randomness
       final List<List<GraphUtils.Edge>> splitEdges = GeneralUtils.splitList(msfEdges, numReducers);
       for (int reducer = 0; reducer < numReducers; reducer++) {
         for (GraphUtils.Edge edge : splitEdges.get(reducer)) {
