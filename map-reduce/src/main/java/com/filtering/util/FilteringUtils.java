@@ -14,6 +14,11 @@ import java.io.FileWriter;
 
 public class FilteringUtils {
   public static MetaData splitGraph(String inputFilePath, String outputDirPath, double epsilon) throws IOException {
+    // TODO: separate into multiple passes
+    // 1. count vertices and edges
+    // 2. split the input file into the required edges
+    // 3. create the output path and write to files
+
     // First pass: count unique vertices and total edges.
     Set<Integer> vertices = new HashSet<>();
     int numEdges = 0;
@@ -66,7 +71,6 @@ public class FilteringUtils {
         throw new IOException("failed to write to file: " + outputFile.getAbsolutePath(), e);
       }
     }
-
     System.out.println("graph successfully split into " + numFiles + " files.");
 
     return md;
