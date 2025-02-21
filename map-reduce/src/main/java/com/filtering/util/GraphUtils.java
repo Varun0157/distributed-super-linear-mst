@@ -47,9 +47,11 @@ public class GraphUtils {
         parent.put(node, node);
         return node;
       }
-      if (!parent.get(node).equals(node)) {
-        parent.put(node, find(parent.get(node)));
+
+      if (parent.get(node) == node) {
+        return node;
       }
+      parent.put(node, find(parent.get(node)));
       return parent.get(node);
     }
 
