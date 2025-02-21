@@ -1,1 +1,1 @@
-hadoop jar target/msf-1.0-SNAPSHOT-jar-with-dependencies.jar MinimumSpanningTree graph.txt data graph 0.1
+hadoop jar target/mst-1.0-SNAPSHOT-jar-with-dependencies.jar graph.txt /home/varun.edachali/map-reduce/ data graph 0.1
