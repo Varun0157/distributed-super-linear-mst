@@ -1,3 +1,5 @@
+package com.filtering.util;
+
 import java.io.*;
 import java.util.*;
 
@@ -51,6 +53,8 @@ public class FilteringUtils {
           writer.newLine();
         }
         writer.close();
+      } catch (IOException e) {
+        throw new IOException("failed to write to file: " + outputFile.getAbsolutePath(), e);
       }
     }
 

@@ -1,3 +1,5 @@
+package com.filtering.util;
+
 import java.util.*;
 
 public class MetaData {
