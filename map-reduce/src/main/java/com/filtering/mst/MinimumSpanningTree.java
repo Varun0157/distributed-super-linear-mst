@@ -14,7 +14,7 @@ public class MinimumSpanningTree {
   private static void calculateMST(String inputDir, String outputPrefix, MetaData md, String localBasePath)
       throws Exception {
     final String basePath = "file://" + localBasePath;
-    String inputPath = basePath + inputDir;
+    String inputPath = new File(basePath, inputDir).toString();
 
     Configuration conf = new Configuration();
     conf.set("fs.defaultFS", "file:///"); // use local file system instead of hdfs
