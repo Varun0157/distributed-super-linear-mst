@@ -1,12 +1,11 @@
 import java.io.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class FilteringUtils {
   public static MetaData splitGraph(String inputFilePath, String outputDirPath, double epsilon) throws IOException {
     // First pass: count unique vertices and total edges.
     Set<Integer> vertices = new HashSet<>();
-    int totalEdges = 0;
+    int numEdges = 0;
 
     try (BufferedReader reader = new BufferedReader(new FileReader(inputFilePath))) {
       String line;
@@ -14,12 +13,13 @@ public class FilteringUtils {
         GraphUtils.Edge edge = GraphUtils.Edge.read(line);
         vertices.add(edge.src);
         vertices.add(edge.dest);
-        totalEdges++;
+        numEdges++;
       }
     }
 
-    final int numVertices = vertices.size();
-    MetaData md = new MetaData(numVertices, totalEdges, epsilon);
+    final int totalVertices = vertices.size();
+    final int totalEdges = numEdges;
+    MetaData md = new MetaData(totalVertices, totalEdges, epsilon);
 
     System.out.println("total unique vertices: " + md.getTotalVertices());
     System.out.println("total edges: " + md.getTotalEdges());
@@ -32,33 +32,28 @@ public class FilteringUtils {
     }
 
     // Second pass: split the input file into multiple files.
-    int fileIndex = 0;
-    int edgeCountInCurrentFile = 0;
-    File currentOutputFile = new File(outputDir, "file" + fileIndex);
-    BufferedWriter writer = new BufferedWriter(new FileWriter(currentOutputFile));
-
+    final int numFiles = md.getNumComputationalNodes(0);
+    List<String> lines = new ArrayList<>();
     try (BufferedReader reader = new BufferedReader(new FileReader(inputFilePath))) {
       String line;
       while ((line = reader.readLine()) != null) {
-        if (edgeCountInCurrentFile >= md.S()) {
-          writer.close();
-          fileIndex++;
-          edgeCountInCurrentFile = 0;
-          currentOutputFile = new File(outputDir, "file" + fileIndex);
-          writer = new BufferedWriter(new FileWriter(currentOutputFile));
-        }
-        writer.write(line);
-        writer.newLine();
-        edgeCountInCurrentFile++;
+        lines.add(line);
       }
     }
-    writer.close();
+    Collections.shuffle(lines);
+    final List<List<String>> splitLines = GeneralUtils.splitList(lines, numFiles);
 
-    final int numFiles = fileIndex + 1;
-    if (numFiles != md.getNumComputationalNodes(0)) {
-      throw new IOException("number of files (" + numFiles + ") does not match number of computational nodes ("
-          + md.getNumComputationalNodes(0) + ")");
+    for (int fileIndex = 0; fileIndex < numFiles; fileIndex++) {
+      File outputFile = new File(outputDirPath, "part-" + fileIndex);
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+        for (String line : splitLines.get(fileIndex)) {
+          writer.write(line);
+          writer.newLine();
+        }
+        writer.close();
+      }
     }
+
     System.out.println("graph successfully split into " + numFiles + " files.");
 
     return md;

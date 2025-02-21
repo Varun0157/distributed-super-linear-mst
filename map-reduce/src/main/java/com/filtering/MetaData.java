@@ -24,8 +24,8 @@ public class MetaData {
     return this.epsilon;
   }
 
-  public double S() {
-    return Math.ceil(Math.pow(this.totalVertices, 1 + this.epsilon));
+  public int S() {
+    return (int) Math.ceil(Math.pow(this.totalVertices, 1 + this.epsilon));
   }
 
   public int getNumEdges(int round) {
@@ -33,7 +33,7 @@ public class MetaData {
       return numEdgesCache.get(round);
     }
 
-    int edges = round <= 0 ? this.totalEdges
+    final int edges = round <= 0 ? this.totalEdges
         : (int) Math.ceil((double) getNumEdges(round - 1) / Math.pow(this.totalVertices, this.epsilon));
     numEdgesCache.put(round, edges);
     return numEdgesCache.get(round);

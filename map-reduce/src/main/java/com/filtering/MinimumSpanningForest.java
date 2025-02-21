@@ -58,11 +58,13 @@ public class MinimumSpanningForest {
         edges.add(edge);
       }
 
-      final List<GraphUtils.Edge> msfEdges = getLocalMSF(edges);
-      for (GraphUtils.Edge edge : msfEdges) {
-        // TODO: change to a uniform spread
-        int reducerNum = random.nextInt(numReducers);
-        context.write(new IntWritable(reducerNum), new Text(edge.toString()));
+      List<GraphUtils.Edge> msfEdges = getLocalMSF(edges);
+      Collections.shuffle(msfEdges, random); // shuffle the edges before split to introduce randomness
+      final List<List<GraphUtils.Edge>> splitEdges = GeneralUtils.splitList(msfEdges, numReducers);
+      for (int reducer = 0; reducer < numReducers; reducer++) {
+        for (GraphUtils.Edge edge : splitEdges.get(reducer)) {
+          context.write(new IntWritable(reducer), new Text(edge.toString()));
+        }
       }
       cleanup(context);
     }
