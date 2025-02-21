@@ -1,5 +1,7 @@
 package com.filtering.mst;
 
+import java.io.File;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileStatus;
@@ -9,8 +11,9 @@ import com.filtering.util.MetaData;
 import com.filtering.util.FilteringUtils;
 
 public class MinimumSpanningTree {
-  private static void calculateMST(String inputDir, String outputPrefix, MetaData md) throws Exception {
-    final String basePath = "file:///home/varun.edachali/map-reduce/";
+  private static void calculateMST(String inputDir, String outputPrefix, MetaData md, String localBasePath)
+      throws Exception {
+    final String basePath = "file://" + localBasePath;
     String inputPath = basePath + inputDir;
 
     Configuration conf = new Configuration();
@@ -24,7 +27,8 @@ public class MinimumSpanningTree {
       System.out.println("round " + round + ": " + numFiles + " files found in " + inputPath);
 
       final int numReducers = md.getNumComputationalNodes(round);
-      final String outputPath = basePath + outputPrefix + round;
+      final String outputPath = new File(basePath, outputPrefix + round).toString();
+
       System.out.println("running job with " + numReducers + " reducers, output will be stored in " + outputPath);
 
       // the mapreduce invoked requires the output path to not exist
@@ -40,7 +44,8 @@ public class MinimumSpanningTree {
       }
 
       if (numFiles <= 1) {
-        System.out.println("only one input file was present. Terminating iterations.");
+        System.out.println();
+        System.out.println("-- only one input file was present -> terminating iterations after " + round + " rounds.");
         break;
       }
 
@@ -50,17 +55,18 @@ public class MinimumSpanningTree {
   }
 
   public static void main(String[] args) throws Exception {
-    if (args.length != 4) {
-      System.out.println("usage args: <graph_path> <input_dir> <output_prefix> <epsilon>");
+    if (args.length != 5) {
+      System.out.println("usage args: <graph_path> <localBasePath> <input_dir> <output_prefix> <epsilon>");
       System.exit(-1);
     }
     final String graphPath = args[0];
-    final String inputDir = args[1];
-    final String outputPrefix = args[2];
-    final float epsilon = Float.parseFloat(args[3]);
+    final String localBasePath = args[1];
+    final String inputDir = args[2];
+    final String outputPrefix = args[3];
+    final float epsilon = Float.parseFloat(args[4]);
 
     MetaData md = FilteringUtils.splitGraph(graphPath, inputDir, epsilon);
     md.printRoundDetails();
-    calculateMST(inputDir, outputPrefix, md);
+    calculateMST(inputDir, outputPrefix, md, localBasePath);
   }
 }
