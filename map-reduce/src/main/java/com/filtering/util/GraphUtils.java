@@ -39,19 +39,15 @@ public class GraphUtils {
     }
   }
 
-  public static class UnionFind {
+  public static class DisjointSetUnion {
     private Map<Integer, Integer> parent = new HashMap<>();
 
     public int find(int node) {
-      if (!parent.containsKey(node)) {
+      if (!parent.containsKey(node))
         parent.put(node, node);
-        return node;
-      }
 
-      if (parent.get(node) == node) {
-        return node;
-      }
-      parent.put(node, find(parent.get(node)));
+      if (parent.get(node) != node)
+        parent.put(node, find(parent.get(node)));
       return parent.get(node);
     }
 
@@ -59,9 +55,8 @@ public class GraphUtils {
       int rootA = find(a);
       int rootB = find(b);
 
-      if (rootA == rootB) {
+      if (rootA == rootB)
         return;
-      }
       parent.put(rootA, rootB);
     }
   }

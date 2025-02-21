@@ -25,29 +25,28 @@ public class MinimumSpanningForest {
   public static class MSTMapper extends Mapper<Object, Text, IntWritable, Text> {
     private int numReducers;
 
+    private List<GraphUtils.Edge> getLocalMSF(List<GraphUtils.Edge> edges) {
+      Collections.sort(edges);
+      GraphUtils.DisjointSetUnion dsu = new GraphUtils.DisjointSetUnion();
+
+      List<GraphUtils.Edge> msfEdges = new ArrayList<>();
+      for (GraphUtils.Edge edge : edges) {
+        int rootSrc = dsu.find(edge.src);
+        int rootDest = dsu.find(edge.dest);
+
+        if (rootSrc == rootDest)
+          continue;
+        msfEdges.add(edge);
+        dsu.union(rootSrc, rootDest);
+      }
+
+      return msfEdges;
+    }
+
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
       super.setup(context);
       numReducers = context.getConfiguration().getInt(NUM_REDUCERS_KEY, -1);
-    }
-
-    private List<GraphUtils.Edge> getLocalMSF(List<GraphUtils.Edge> edges) {
-      Collections.sort(edges);
-      GraphUtils.UnionFind uf = new GraphUtils.UnionFind();
-
-      List<GraphUtils.Edge> msfEdges = new ArrayList<>();
-      for (GraphUtils.Edge edge : edges) {
-        int rootSrc = uf.find(edge.src);
-        int rootDest = uf.find(edge.dest);
-
-        if (rootSrc == rootDest) {
-          continue;
-        }
-        msfEdges.add(edge);
-        uf.union(rootSrc, rootDest);
-      }
-
-      return msfEdges;
     }
 
     @Override

@@ -31,7 +31,7 @@ public class MinimumSpanningTree {
 
       System.out.println("running job with " + numReducers + " reducers, output will be stored in " + outputPath);
 
-      // the mapreduce invoked requires the output path to not exist
+      // hadoop mapreduce invoked requires the output path to not exist
       Path outPath = new Path(outputPath);
       if (fs.exists(outPath)) {
         fs.delete(outPath, true);

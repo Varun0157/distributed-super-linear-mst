@@ -7,7 +7,7 @@ public class MetaData {
   private int totalVertices;
   private double epsilon;
   private int totalEdges;
-  private Map<Integer, Integer> numEdgesCache = new HashMap<>();
+  private Map<Integer, Integer> numEdgesStore = new HashMap<>();
 
   public MetaData(int numVertices, int numEdges, double epsilon) {
     this.totalVertices = numVertices;
@@ -32,14 +32,12 @@ public class MetaData {
   }
 
   public int getNumEdges(int round) {
-    if (numEdgesCache.containsKey(round)) {
-      return numEdgesCache.get(round);
+    if (!numEdgesStore.containsKey(round)) {
+      final int edges = round <= 0 ? this.totalEdges
+          : (int) Math.ceil((double) getNumEdges(round - 1) / Math.pow(this.totalVertices, this.epsilon));
+      numEdgesStore.put(round, edges);
     }
-
-    final int edges = round <= 0 ? this.totalEdges
-        : (int) Math.ceil((double) getNumEdges(round - 1) / Math.pow(this.totalVertices, this.epsilon));
-    numEdgesCache.put(round, edges);
-    return numEdgesCache.get(round);
+    return numEdgesStore.get(round);
   }
 
   public int getNumComputationalNodes(int round) {
