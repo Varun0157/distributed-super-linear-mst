@@ -1,6 +1,7 @@
 package com.filtering.util;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MetaData {
   private int totalVertices;
