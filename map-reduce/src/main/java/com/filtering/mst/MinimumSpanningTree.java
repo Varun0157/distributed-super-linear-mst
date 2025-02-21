@@ -1,10 +1,5 @@
 package com.filtering.mst;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileStatus;
@@ -14,33 +9,6 @@ import com.filtering.util.MetaData;
 import com.filtering.util.FilteringUtils;
 
 public class MinimumSpanningTree {
-  private static void deleteMetaDataFiles(String dirPath, String prefix) throws IOException {
-    try {
-      File dir = new File(new URI(dirPath));
-      if (!dir.exists()) {
-        throw new IOException("directory does not exist: " + dirPath);
-      }
-      if (!dir.isDirectory()) {
-        throw new IOException("not a directory: " + dirPath);
-      }
-
-      File[] files = dir.listFiles((directory, fileName) -> fileName.startsWith(prefix));
-      if (files == null) {
-        throw new IOException("unable to list files in directory: " + dirPath);
-      }
-
-      for (File file : files) {
-        System.out.println("deleting " + file.getName());
-        if (file.delete()) {
-          continue;
-        }
-        throw new IOException("failed to delete " + file.getName());
-      }
-    } catch (URISyntaxException e) {
-      throw new IOException("invalid uri syntax", e);
-    }
-  }
-
   private static void calculateMST(String inputDir, String outputPrefix, MetaData md) throws Exception {
     final String basePath = "file:///home/varun.edachali/map-reduce/";
     String inputPath = basePath + inputDir;
@@ -70,8 +38,6 @@ public class MinimumSpanningTree {
         System.err.println("job failed in round " + round);
         System.exit(1);
       }
-      // goal: get rid of the _SUCCESSS files
-      deleteMetaDataFiles(outputPath, "_");
 
       if (numFiles <= 1) {
         System.out.println("only one input file was present. Terminating iterations.");

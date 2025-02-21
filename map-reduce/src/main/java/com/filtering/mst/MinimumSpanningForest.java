@@ -91,6 +91,9 @@ public class MinimumSpanningForest {
 
   public static boolean calculateMSF(String inputPath, String outputPath, int numReducers) throws Exception {
     Configuration conf = new Configuration();
+    // prevent the _SUCCESS file from being created so we can process output
+    conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false");
+
     Job job = Job.getInstance(conf, "Minimum Spanning Forest");
 
     job.setJarByClass(MinimumSpanningForest.class);
