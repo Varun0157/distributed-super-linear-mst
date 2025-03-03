@@ -1,6 +1,7 @@
 package com.filtering.mst;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -67,6 +68,10 @@ public class MinimumSpanningTree {
 
     MetaData md = FilteringUtils.splitGraph(graphPath, inputDir, epsilon);
     md.printRoundDetails();
+
+    long startTime = System.nanoTime();
     calculateMST(inputDir, outputPrefix, md, localBasePath);
+    long elapsedTime = TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime);
+    System.out.println("elapsed time: " + elapsedTime + " seconds");
   }
 }

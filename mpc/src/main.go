@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 
 	utils "mst/superlinear/utils"
 )
@@ -66,6 +67,8 @@ func run(graphFile string, outFile string, epsilon float64) error {
 		nodes = append(nodes, nodeLis.Addr().String())
 	}
 
+	startTime := time.Now()
+
 	serverWg := sync.WaitGroup{}
 	for i := range numComputationalNodes {
 		serverWg.Add(1)
@@ -85,6 +88,9 @@ func run(graphFile string, outFile string, epsilon float64) error {
 		}()
 	}
 	serverWg.Wait()
+
+	elapsedTime := time.Since(startTime)
+	log.Printf("elapsed time: %v", elapsedTime)
 
 	return nil
 }
