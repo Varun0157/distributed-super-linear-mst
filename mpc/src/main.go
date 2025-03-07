@@ -73,6 +73,7 @@ func run(graphFile string, outFile string, epsilon float64) error {
 	for i := range numComputationalNodes {
 		serverWg.Add(1)
 
+		// shutdown the server and make it go out of scope when the driver returns
 		go func() {
 			defer serverWg.Done()
 
@@ -85,6 +86,8 @@ func run(graphFile string, outFile string, epsilon float64) error {
 			}
 
 			s.runDriver(outFile)
+			s.ShutDown()
+			log.Printf("COMPUTATION COMPLETE -> %d rounds", s.round)
 		}()
 	}
 	serverWg.Wait()

@@ -66,7 +66,6 @@ func (s *FilteringServer) runDriver(outFile string) {
 
 	for range ticker.C {
 		if s.md.numComputationalNodes(s.round) <= s.addrDetails.index {
-			s.ShutDown()
 			return
 		}
 
@@ -90,8 +89,7 @@ func (s *FilteringServer) runDriver(outFile string) {
 			if err != nil {
 				log.Fatalf("%s - failed to write graph: %v", s.addrDetails.nodes[s.addrDetails.index], err)
 			}
-			s.ShutDown()
-			log.Printf("COMPUTATION COMPLETE in %d rounds", s.round)
+			log.Printf("graph written to %s", outFile)
 			return
 		}
 
