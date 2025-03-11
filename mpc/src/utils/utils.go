@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"time"
 )
 
 func Partition[T any](data []T, numPartitions int) ([][]T, error) {
@@ -29,4 +30,8 @@ func Partition[T any](data []T, numPartitions int) ([][]T, error) {
 	}
 
 	return result, nil
+}
+
+func RpcTimeout() time.Duration {
+	return 120 * time.Second
 }

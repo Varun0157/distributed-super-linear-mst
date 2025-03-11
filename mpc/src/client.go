@@ -5,7 +5,6 @@ import (
 	"fmt"
 	comms "mst/superlinear/comms"
 	utils "mst/superlinear/utils"
-	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -30,7 +29,7 @@ func sendEdges(edges []utils.Edge, senderAddr string, receiverAddr string) error
 
 	req := &comms.EdgeDataRequest{Edges: edgeData, Addr: senderAddr}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), utils.RpcTimeout())
 	defer cancel()
 
 	resp, err := client.SendEdgeData(ctx, req)
