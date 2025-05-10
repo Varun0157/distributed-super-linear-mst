@@ -1,4 +1,4 @@
-Implementations of the calculation of a Minimum Spanning Tree of a given graph in a distributed setting (in a traditional distributed setting, as well as a map-reduce variant), assuming super-linear compute per node, as defined [by Mohsen Ghaffari](https://people.csail.mit.edu/ghaffari/MPA19/Notes/MPA.pdf). 
+Implementations of the calculation of a Minimum Spanning Tree of a given graph in a distributed setting (in a traditional massively parallel computing setting, as well as a map-reduce variant), assuming super-linear compute per node, as defined [by Mohsen Ghaffari](https://people.csail.mit.edu/ghaffari/MPA19/Notes/MPA.pdf). 
 
 
 # Benchmarking
