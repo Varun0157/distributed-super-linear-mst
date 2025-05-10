@@ -21,7 +21,7 @@ Implementations of the calculation of a Minimum Spanning Tree of a given graph i
 
 The benchmarking was mostly done with respect to the number of communication rounds rather than the wall-clock time. In traditional MPC algorithms, this is how performance is measured. 
 
-The Map-Reduce implementation consistently takes one more round than that of its MPC variant because it has to make an additional communication (map + reduce step) to filter down from the graph that can fit in a single node, down to the MST itself. In the MPC implementation, this computation is local to a node and does not require an additional computation. 
+The Map-Reduce implementation consistently takes one more round than that of its MPC variant because it has to make an additional communication (map + reduce step) to filter down from the graph that can fit in a single node, down to the MST itself. In the MPC implementation, this computation is local to a node and does not require an additional communication. 
 
 It may be significant to note that the MapReduce implementation always took significantly longer, likely because of the repeated reads and writes to disk. Since the MPC implementation is just a local simulation, the cost of each communication was considerably less.
 
