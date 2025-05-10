@@ -14,5 +14,8 @@ In order to automatically generate a large graph, generate a ground truth using 
 bash scripts/test.sh
 ```
 
+> [!NOTE]  
+> The graph is initially loaded into memory completely in order to split it into the required nodes. This is the only point at which any given process may exceed the memory constraint set by n and epsilon. 
+
 #### TODO 
 - [ ] diagram of methodology 
