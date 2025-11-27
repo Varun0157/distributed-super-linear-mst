@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"math/rand"
@@ -32,20 +33,24 @@ func listenOnRandomAddr() (lis net.Listener, err error) {
 }
 
 func run(graphFile string, outFile string, epsilon float64) error {
-	edges, numVertices, err := utils.ReadGraph(graphFile)
+	file, err := os.Open(graphFile)
+	if err != nil {
+		return fmt.Errorf("failed to open graph file: %v", err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	numVertices, numEdges, err := utils.ReadMetadata(scanner)
 	if err != nil {
 		return err
 	}
 
-	md := NewMetaData(len(edges), numVertices, epsilon)
+	md := NewMetaData(numEdges, numVertices, epsilon)
 	log.Printf("metadata: %v", md)
 	md.printRoundDetails()
 	numComputationalNodes := md.numComputationalNodes(0)
 
-	partitionedEdges, err := utils.Partition(edges, numComputationalNodes)
-	if err != nil {
-		return fmt.Errorf("failed to partition edges: %v", err)
-	}
+	generateEdges := utils.CreateEdgesGenerator(scanner, numEdges, numComputationalNodes)
 
 	listeners := make([]net.Listener, 0)
 	for range numComputationalNodes {
@@ -72,7 +77,10 @@ func run(graphFile string, outFile string, epsilon float64) error {
 		go func() {
 			defer serverWg.Done()
 
-			localEdges := partitionedEdges[i]
+			localEdges, err := generateEdges()
+			if err != nil {
+				log.Fatalf("failed to generate edges: %v", err)
+			}
 			localLis := listeners[i]
 
 			s, err := NewFilteringServer(localLis, nodes, localEdges, md)
