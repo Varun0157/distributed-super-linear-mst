@@ -32,12 +32,7 @@ func listenOnRandomAddr() (lis net.Listener, err error) {
 }
 
 func run(graphFile string, outFile string, epsilon float64) error {
-	edges, err := utils.ReadGraph(graphFile)
-	if err != nil {
-		return err
-	}
-
-	numVertices, err := utils.GetNumberOfVertices(edges)
+	edges, numVertices, err := utils.ReadGraph(graphFile)
 	if err != nil {
 		return err
 	}

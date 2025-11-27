@@ -6,8 +6,6 @@ import (
 	"math"
 	"os"
 	"sort"
-	"strconv"
-	"strings"
 )
 
 type Edge struct {
@@ -22,17 +20,6 @@ func NewEdge(src, dest, weight int) Edge {
 		Dest:   dest,
 		Weight: weight,
 	}
-}
-
-func GetNumberOfVertices(edges []Edge) (int, error) {
-	uniqueVertices := make(map[int]bool)
-
-	for _, edge := range edges {
-		uniqueVertices[edge.Src] = true
-		uniqueVertices[edge.Dest] = true
-	}
-
-	return len(uniqueVertices), nil
 }
 
 func getMaxVertex(edges []Edge) (int, error) {
@@ -61,39 +48,6 @@ func MST(edges []Edge) ([]Edge, error) {
 	}
 
 	return k.ConstructMST()
-}
-
-func ReadGraph(fileName string) ([]Edge, error) {
-	file, err := os.Open(fileName)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	var edges []Edge
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		parts := strings.Fields(scanner.Text())
-		if len(parts) != 3 {
-			return nil, fmt.Errorf("invalid line: %s", scanner.Text())
-		}
-
-		src, err1 := strconv.Atoi(parts[0])
-		dest, err2 := strconv.Atoi(parts[1])
-		weight, err3 := strconv.Atoi(parts[2])
-
-		if err1 != nil || err2 != nil || err3 != nil {
-			return nil, fmt.Errorf("invalid line: %s", scanner.Text())
-		}
-
-		edges = append(edges, NewEdge(src, dest, weight))
-	}
-
-	if err = scanner.Err(); err != nil {
-		return nil, err
-	}
-
-	return edges, nil
 }
 
 func SortEdges(edges []Edge) {

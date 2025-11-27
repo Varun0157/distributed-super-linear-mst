@@ -4,6 +4,7 @@ import argparse
 
 def generate_graph(n, m, output_file):
     edges = set()
+    vertices = set()
 
     while len(edges) < m:
         u = random.randint(1, n)
@@ -11,8 +12,17 @@ def generate_graph(n, m, output_file):
 
         if u != v and (u, v) not in edges:
             edges.add((u, v))
+        vertices.add(u)
+        vertices.add(v)
+
+    num_vertices = len(vertices)
+    num_edges = len(edges)
 
     with open(output_file, "w") as f:
+        # write metadata to file
+        f.write(f"{num_vertices} {num_edges}\n")
+
+        # write the edges themselves
         for u, v in edges:
             weight = random.randint(1, 1000)
             f.write(f"{u} {v} {weight}\n")

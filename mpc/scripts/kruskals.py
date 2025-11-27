@@ -42,15 +42,17 @@ def read_graph_from_file(filename):
     nodes = set()
 
     with open(filename, "r") as file:
+        num_vertices, _ = map(int, file.readline().strip().split())
+
         for line in file:
             parts = line.strip().split()
             if len(parts) != 3:
-                continue
+                raise ValueError("Each edge line must contain exactly three integers.")
             u, v, w = int(parts[0]), int(parts[1]), int(parts[2])
             edges.append((u, v, w))
             nodes.update([u, v])
 
-    return edges, max(nodes)  # Adjust for 1-based index
+    return edges, num_vertices
 
 
 def main():
