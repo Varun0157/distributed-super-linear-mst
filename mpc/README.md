@@ -7,6 +7,7 @@ Step into the source directory, and set up the required dependencies (primarily 
 ```sh
 cd src
 go mod tidy
+bash setup.sh
 cd -
 ```
 
